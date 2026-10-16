@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RScript;
 import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.IntegerCodec;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.Resource;
@@ -20,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 public class CounterManager {
 
     @Resource
+    @Lazy
     private RedissonClient redissonClient;
 
     /**
