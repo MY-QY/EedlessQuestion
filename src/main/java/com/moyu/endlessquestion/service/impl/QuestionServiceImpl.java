@@ -60,7 +60,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @Slf4j
-public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> implements QuestionService {
+public class  QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> implements QuestionService {
 
     @Resource
     private UserService userService;

@@ -19,7 +19,7 @@ public class UserServiceTest {
 
     @Test
     void userRegister() {
-        String userAccount = "yupi";
+        String userAccount = "moyu";
         String userPassword = "";
         String checkPassword = "123456";
         try {
