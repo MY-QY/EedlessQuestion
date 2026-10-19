@@ -94,9 +94,9 @@ spring:
   # todo 需替换配置，然后取消注释
   redis:
     database: 1
-    host: localhost
+    host: 112.124.55.173
     port: 6379
-  #    password: 123456
+    password: 6676
   # Elasticsearch 配置
   # todo 需替换配置，然后取消注释
   elasticsearch:
