@@ -6,9 +6,16 @@ import com.moyu.endlessquestion.mapper.QuestionMapper;
 import com.moyu.endlessquestion.model.dto.question.QuestionEsDTO;
 import com.moyu.endlessquestion.model.entity.Question;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.RefreshPolicy;
+import org.springframework.data.elasticsearch.core.query.BulkOptions;
+import org.springframework.data.elasticsearch.core.query.IndexQuery;
+import org.springframework.data.elasticsearch.core.query.IndexQueryBuilder;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import jakarta.annotation.Resource;
+import org.springframework.stereotype.Component;
+
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,16 +26,18 @@ import java.util.stream.Collectors;
  * @author MOYU
  */
 // todo 取消注释开启任务
-//@Component
+@Component
 @Slf4j
 public class IncSyncQuestionToEs {
 
     @Resource
     private QuestionMapper questionMapper;
 
-    @Resource
-    private QuestionEsDao questionEsDao;
+//    @Resource
+//    private QuestionEsDao questionEsDao;
 
+    @Resource
+    private ElasticsearchOperations elasticsearchOperations;
     /**
      * 每分钟执行一次
      */
@@ -48,11 +57,38 @@ public class IncSyncQuestionToEs {
         final int pageSize = 500;
         int total = questionEsDTOList.size();
         log.info("IncSyncQuestionToEs start, total {}", total);
+
+        // 不主动刷新，等待 ES 自动刷新
+        BulkOptions bulkOptions = BulkOptions.builder()
+                .withRefreshPolicy(RefreshPolicy.NONE)
+                .build();
+//        for (int i = 0; i < total; i += pageSize) {
+//            int end = Math.min(i + pageSize, total);
+//            log.info("sync from {} to {}", i, end);
+//            questionEsDao.saveAll(questionEsDTOList.subList(i, end));
+//        }
         for (int i = 0; i < total; i += pageSize) {
             int end = Math.min(i + pageSize, total);
+
+            List<IndexQuery> queries = questionEsDTOList
+                    .subList(i, end)
+                    .stream()
+                    .map(dto -> new IndexQueryBuilder()
+                            .withId(String.valueOf(dto.getId()))
+                            .withObject(dto)
+                            .build())
+                    .collect(Collectors.toList());
+
             log.info("sync from {} to {}", i, end);
-            questionEsDao.saveAll(questionEsDTOList.subList(i, end));
+
+            elasticsearchOperations.bulkIndex(
+                    queries,
+                    bulkOptions,
+                    QuestionEsDTO.class
+            );
         }
+
+
         log.info("IncSyncQuestionToEs end, total {}", total);
     }
 }

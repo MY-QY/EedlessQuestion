@@ -7,6 +7,7 @@ import com.moyu.endlessquestion.model.entity.Question;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
@@ -14,8 +15,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-// todo 取消注释开启 ES（须先配置 ES）
-//@Document(indexName = "question")
+@Document(indexName = "question")
 @Data
 public class QuestionEsDTO implements Serializable {
 
